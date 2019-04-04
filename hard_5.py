@@ -21,7 +21,22 @@ import sys
 import shutil
 
 print('sys.argv = ', sys.argv)
-all_path = os.getcwd()
+conf_path = os.path.join(os.getcwd(),'hardConfig.txt')
+if os.path.exists( conf_path):
+    hard_conf = open(conf_path, 'r')
+    conf_list = hard_conf.readlines()
+    if conf_list:
+        all_path = conf_list[0]
+        print(all_path)
+        hard_conf.close()
+    else:
+        all_path = os.getcwd()
+else:
+    all_path = os.getcwd()
+
+
+
+
 
 def print_help():
     print("help - получение справки")
@@ -52,11 +67,15 @@ def copy_file():
         return
     file_path = os.path.join(all_path, file_name)
     new_file_path = file_path + '_copy'
-    if os.path.exists( new_file_path):
-        print('Файл уже существует\n')
-    else:
+    try:
         shutil.copy(file_path, new_file_path)
         print(f'файл {new_file_path} успешно создан\n')
+    except FileNotFoundError:
+        print('Файла с таким именем нет')
+    if os.path.exists( new_file_path):
+        print('Файл уже существует\n')
+
+
 
 def rm_file():
     if not file_name:
@@ -76,21 +95,25 @@ def rm_file():
         print('Ответте Y или N')
 
 def full_path():
-    print('Полный путь к текущей дериктории: ', all_path)
+    print('Полный путь к текущей дериктории: ', os.path.abspath(all_path))
 
 def cd():
-    global all_path
-    if not file_name:
-        print("Необходимо указать пкть вторым параметром")
+    if not new_path:
+        print("Необходимо указать путь вторым параметром")
         return
     try:
-        all_path = os.chdir(new_path)
-        print(f'Переходв в {new_path} произошел успешно')
+        new_dir_path = os.path.join(new_path)
+        all_path = os.chdir(new_dir_path)
+        hard_conf = open(conf_path, 'w+')
+        all_path = hard_conf.write(new_dir_path)
+        print(f'Переходв в {new_dir_path} произошел успешно')
+        hard_conf.close()
     except FileNotFoundError:
         print('Такой дериктории нет')
 
 def ping():
     print("pong")
+
 
 do = {
     "help": print_help,
@@ -99,7 +122,7 @@ do = {
     "rm":rm_file,
     "cd":cd,
     "ls":full_path,
-    "ping": ping
+    "ping": ping,
     }
 
 try:
@@ -107,7 +130,8 @@ try:
 except IndexError:
     dir_name = None
 try:
-    new_path = sys.argv[2]
+    new_path = os.path.join(all_path,sys.argv[2])
+    new_path = os.path.abspath(new_path)
 except IndexError:
     new_path = None
 
