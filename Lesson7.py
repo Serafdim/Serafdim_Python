@@ -98,7 +98,7 @@ def prin_tic(st1, st2, st3, who):
     print(f'Карточка {who}')
     print(st1)
     print(st2)
-    print(st3)
+    print(st3,'\n')
 
 
 class Ticket_hum:
@@ -177,10 +177,15 @@ keg = iter(keg)
 while True:
     try:
         del_keg = next(keg)
-        print(f'Боченок № {del_keg}')
+        print(f'\nБоченок № {del_keg}\n')
         prin_tic(tic_hum.st1, tic_hum.st2, tic_hum.st3,'человека')
         prin_tic(tic_comp.st1, tic_comp.st2, tic_comp.st3, 'компьютера')
-        answer = input('Зачеркнуть число? Y/N: ')
+        while True:
+            answer = input('Зачеркнуть число? Y/N: ')
+            if answer != 'Y' and answer != 'N':
+                print('\nВведите "Y" или "N"\n')
+            else:
+                break
         attempt = tic_hum.find_num(del_keg)
         if answer == 'Y' and attempt == "NO":
             print('Вы проиграли!')
